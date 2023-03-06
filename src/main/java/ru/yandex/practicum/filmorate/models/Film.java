@@ -1,5 +1,10 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.models;
 
+import ru.yandex.practicum.filmorate.annotations.ReleaseDate;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -7,9 +12,13 @@ import java.util.Objects;
 public class Film implements Serializable {
 
     private int id;
+    @NotBlank(message = "Film name is either empty or null.")
     private String name;
+    @Size(max = 200, message = "Film description is longer than 200 chars.")
     private String description;
+    @ReleaseDate
     private LocalDate releaseDate;
+    @Positive(message = "Film duration is negative.")
     private int duration;
 
     public Film() {
@@ -83,8 +92,4 @@ public class Film implements Serializable {
     public void setDuration(int duration) {
         this.duration = duration;
     }
-
-
-
-
 }

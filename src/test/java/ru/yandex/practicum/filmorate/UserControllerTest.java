@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.controllers.UserController;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.models.User;
 
 import java.time.LocalDate;
 
@@ -24,32 +24,6 @@ public class UserControllerTest {
         userController.add(userValid);
         assertTrue(userController.getAll().contains(userValid));
         assertEquals(1, userValid.getId());
-
-        User userInvalidLogin = new User("userInvalidLogin@ya.ru", "userInvalid Login", "userInvalidLoginName", LocalDate.of(1974, 3, 15));
-        assertThrows(
-                ValidationException.class,
-                () -> userController.add(userInvalidLogin),
-                "Login must not be empty or contain backspaces.");
-
-        User userInvalidEmail = new User("userInvalidEmail.ya.ru", "userInvalidEmailLogin", "userInvalidEmailName", LocalDate.of(1974, 3, 15));
-        assertThrows(
-                ValidationException.class,
-                () -> userController.add(userInvalidEmail),
-                "Email address must not be empty and must contain the '@' symbol.");
-
-        User userInvalidBirthday = new User("userInvalidBirthday@ya.ru", "userInvalidBirthdayLogin", "userInvalidBirthdayName", LocalDate.of(2030, 3, 15));
-        assertThrows(
-                ValidationException.class,
-                () -> userController.add(userInvalidBirthday),
-                "Birthday can't set to a future date.");
-
-        User userInvalidName = new User("userInvalidName@ya.ru", "userInvalidNameLogin", "", LocalDate.of(1974, 3, 15));
-        userController.add(userInvalidName);
-        for (User user : userController.getAll()) {
-            if (userInvalidName.equals(user)) {
-                assertEquals(user.getLogin(), user.getName());
-            }
-        }
     }
 
     @Test

@@ -1,16 +1,22 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.models;
 
+import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
 
 public class User implements Serializable {
 
-    int id;
-    String email;
-    String login;
-    String name;
-    LocalDate birthday;
+    private int id;
+    @NotEmpty(message = "Email must not be null or empty.")
+    @Email(message = "Incorrect email format.")
+    private String email;
+    @NotBlank
+    private String login;
+    private String name;
+    @NotNull
+    @PastOrPresent
+    private LocalDate birthday;
 
     public User() {
     }
