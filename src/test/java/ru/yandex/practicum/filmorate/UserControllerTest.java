@@ -1,59 +1,181 @@
 package ru.yandex.practicum.filmorate;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.util.NestedServletException;
 import ru.yandex.practicum.filmorate.controllers.UserController;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.models.User;
 
 import java.time.LocalDate;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@SpringBootTest
+@AutoConfigureMockMvc
 public class UserControllerTest {
 
-    UserController userController;
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().registerModule(new JavaTimeModule());
+    @Autowired
+    private MockMvc mockMvc;
+    private User userValid;
 
     @BeforeEach
-    public void setup(){ userController = new UserController();
+    void setup(){
+        this.mockMvc = MockMvcBuilders.standaloneSetup(new UserController()).build();
     }
 
     @Test
-    public void add() {
-        User userValid = new User("userValid@ya.ru", "userValidLogin", "userValidName", LocalDate.of(1974, 3, 15));
-        userController.add(userValid);
-        assertTrue(userController.getAll().contains(userValid));
-        assertEquals(1, userValid.getId());
+    void addUserValid() throws Exception {
+        userValid = new User("user@ya.ru", "userLogin", "userName", LocalDate.of(1974, 3, 15));
+        String userString = OBJECT_MAPPER.writeValueAsString(userValid);
+        MvcResult userValidResult = mockMvc.perform(MockMvcRequestBuilders
+                        .post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userString))
+                .andExpect(status().is2xxSuccessful())
+                .andDo(print())
+                .andReturn();
+
+        User userReceived = OBJECT_MAPPER.readValue(userValidResult.getResponse().getContentAsString(), User.class);
+        userValid.setId(1);
+        assertEquals(userValid, userReceived);
     }
 
     @Test
-    public void update() {
-        User userNew = new User("userNew@ya.ru", "userNewLogin", "userNewName", LocalDate.of(1974, 3, 15));
-        userController.add(userNew);
+    void addUserEmptyName() throws Exception {
+        User userEmptyName = new User("user@ya.ru", "userLogin", "", LocalDate.of(1974, 3, 15));
+        String userString = OBJECT_MAPPER.writeValueAsString(userEmptyName);
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
+                        .post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userString))
+                .andExpect(status().is2xxSuccessful())
+                .andDo(print())
+                .andReturn();
 
-        User userUpdate = new User(1,"userUpdate@ya.ru", "userUpdateLogin", "userUpdateName", LocalDate.of(1964, 8, 9));
-        userController.update(userUpdate);
-        assertTrue(userController.getAll().contains(userUpdate));
-        for (User user : userController.getAll()) {
-            if (userUpdate.getId() == user.getId()) {
-                assertEquals(userUpdate.getEmail(), user.getEmail());
-                assertEquals(userUpdate.getLogin(), user.getLogin());
-                assertEquals(userUpdate.getName(), user.getName());
-                assertEquals(userUpdate.getBirthday(), user.getBirthday());
-            }
-        }
-
-        User userInvalidIdUpdate = new User(10,"userInvalidUpdate@ya.ru", "userInvalidUpdateLogin", "userInvalidUpdateName", LocalDate.of(1954, 6, 2));
-        assertThrows(
-                ValidationException.class,
-                () -> userController.update(userInvalidIdUpdate),
-                "User with this id was not found and could not be updated.");
+        User userReceived = OBJECT_MAPPER.readValue(mvcResult.getResponse().getContentAsString(), User.class);
+        assertEquals(userReceived.getName(), userEmptyName.getLogin());
     }
 
     @Test
-    public void getAll() {
-        User user = new User("userValid@ya.ru", "userValidLogin", "userValidName", LocalDate.of(1974, 3, 15));
-        userController.add(user);
-        assertEquals(1, userController.getAll().size());
+    void addUserInvalidLogin() throws Exception {
+        User userInvalidLogin = new User("user@ya.ru", "user InvalidLogin", "userName", LocalDate.of(1974, 3, 15));
+        String userString = OBJECT_MAPPER.writeValueAsString(userInvalidLogin);
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userString))
+                .andExpect(status().is4xxClientError())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    void addUserInvalidEmail() throws Exception {
+        User userInvalidEmail = new User("ya.ru", "userLogin", "userName", LocalDate.of(1974, 3, 15));
+        String userString = OBJECT_MAPPER.writeValueAsString(userInvalidEmail);
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userString))
+                .andExpect(status().is4xxClientError())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    void addUserInvalidBirthday() throws Exception {
+        User userInvalidBirthday = new User("user@ya.ru", "userLogin", "userName", LocalDate.of(2040, 3, 15));
+        String userString = OBJECT_MAPPER.writeValueAsString(userInvalidBirthday);
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userString))
+                .andExpect(status().is4xxClientError())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    void updateUserValid() throws Exception {
+        userValid = new User("user@ya.ru", "userLogin", "userName", LocalDate.of(1974, 3, 15));
+        String userString = OBJECT_MAPPER.writeValueAsString(userValid);
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userString))
+                .andExpect(status().is2xxSuccessful())
+                .andDo(print())
+                .andReturn();
+
+        User userValidUpdate = new User(1, "userUpdate@ya.ru", "userUpdateLogin", "userUpdateName", LocalDate.of(1978, 3, 15));
+        String userValidUpdateString = OBJECT_MAPPER.writeValueAsString(userValidUpdate);
+        MvcResult userValidUpdateResult = mockMvc.perform(MockMvcRequestBuilders
+                        .put("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userValidUpdateString))
+                .andExpect(status().is2xxSuccessful())
+                .andDo(print())
+                .andReturn();
+
+        User userReceived = OBJECT_MAPPER.readValue(userValidUpdateResult.getResponse().getContentAsString(), User.class);
+        userValid.setId(1);
+        assertEquals(userValidUpdate, userReceived);
+    }
+
+    @Test
+    void updateUserInvalid() throws Exception {
+        User userInvalidUpdate = new User(10, "userUpdate@ya.ru", "userUpdateLogin", "userUpdateName", LocalDate.of(1978, 3, 15));
+        String userInvalidUpdateString = OBJECT_MAPPER.writeValueAsString(userInvalidUpdate);
+        assertThrows(NestedServletException.class, () -> mockMvc.perform(MockMvcRequestBuilders
+                .put("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(userInvalidUpdateString)));
+    }
+
+    @Test
+    void getAllUsers() throws Exception {
+
+        userValid = new User("user@ya.ru", "userLogin", "userName", LocalDate.of(1974, 3, 15));
+        String userString = OBJECT_MAPPER.writeValueAsString(userValid);
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userString))
+                .andExpect(status().is2xxSuccessful())
+                .andDo(print())
+                .andReturn();
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userString))
+                .andExpect(status().is2xxSuccessful())
+                .andDo(print())
+                .andReturn();
+
+        MvcResult getAllUsersResult = mockMvc.perform(MockMvcRequestBuilders
+                        .get("/users"))
+                .andExpect(status().is2xxSuccessful())
+                .andDo(print())
+                .andReturn();
+
+        List<User> usersReturned = OBJECT_MAPPER.readValue(getAllUsersResult.getResponse().getContentAsString(), new TypeReference<>() {});
+        assertEquals(usersReturned.size(), 2);
     }
 }

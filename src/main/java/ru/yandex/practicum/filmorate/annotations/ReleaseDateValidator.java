@@ -16,7 +16,7 @@ public class ReleaseDateValidator implements ConstraintValidator<ReleaseDate, Lo
         if(releaseDate == null) {
             return false;
         }
-        return releaseDate.isAfter(BIRTHDAY_OF_CINEMA) && releaseDate.isBefore(LocalDate.now());
+        return releaseDate.isAfter(BIRTHDAY_OF_CINEMA);
     }
 
 }

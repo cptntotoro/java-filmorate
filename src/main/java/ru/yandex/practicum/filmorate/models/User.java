@@ -8,10 +8,13 @@ import java.util.Objects;
 public class User implements Serializable {
 
     private int id;
-    @NotEmpty(message = "Email must not be null or empty.")
-    @Email(message = "Incorrect email format.")
+    @NotEmpty
+    @Email
+    @Pattern(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
     private String email;
+    @NotNull
     @NotBlank
+    @Pattern(regexp = "^[^\\s]*$")
     private String login;
     private String name;
     @NotNull

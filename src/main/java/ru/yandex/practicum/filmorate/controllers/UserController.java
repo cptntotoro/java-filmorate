@@ -38,7 +38,6 @@ public class UserController {
             users.put(user.getId(), user);
             return user;
         }
-
         log.warn("User was not found and could not be updated.");
         throw new ValidationException("User with this id was not found and could not be updated.");
     }

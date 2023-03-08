@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.models;
 import ru.yandex.practicum.filmorate.annotations.ReleaseDate;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -14,6 +15,7 @@ public class Film implements Serializable {
     private int id;
     @NotBlank(message = "Film name is either empty or null.")
     private String name;
+    @NotNull
     @Size(max = 200, message = "Film description is longer than 200 chars.")
     private String description;
     @ReleaseDate
