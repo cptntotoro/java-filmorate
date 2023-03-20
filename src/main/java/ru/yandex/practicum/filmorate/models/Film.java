@@ -8,20 +8,28 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 public class Film implements Serializable {
 
     private int id;
+
     @NotBlank(message = "Film name is either empty or null.")
     private String name;
+
     @NotNull
     @Size(max = 200, message = "Film description is longer than 200 chars.")
     private String description;
+
     @ReleaseDate
     private LocalDate releaseDate;
+
     @Positive(message = "Film duration is negative.")
     private int duration;
+
+    Set<Integer> whoLiked = new HashSet<>();
 
     public Film() {
     }
@@ -34,11 +42,8 @@ public class Film implements Serializable {
     }
 
     public Film(int id, String name, String description, LocalDate releaseDate, int duration) {
+        this(name, description, releaseDate, duration);
         this.id = id;
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
     }
 
     @Override
@@ -47,12 +52,13 @@ public class Film implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         Film film = (Film) o;
         return id == film.id && duration == film.duration && name.equals(film.name) &&
-                description.equals(film.description) && releaseDate.equals(film.releaseDate);
+                description.equals(film.description) && releaseDate.equals(film.releaseDate) &&
+                Objects.equals(whoLiked, film.whoLiked);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, releaseDate, duration);
+        return Objects.hash(id, name, description, releaseDate, duration, whoLiked);
     }
 
     public int getId() {
@@ -93,5 +99,21 @@ public class Film implements Serializable {
 
     public void setDuration(int duration) {
         this.duration = duration;
+    }
+
+    public Set<Integer> getWhoLiked() {
+        return whoLiked;
+    }
+
+    public void setWhoLiked(Set<Integer> whoLiked) {
+        this.whoLiked = whoLiked;
+    }
+
+    public void addLike(Integer userId) {
+        whoLiked.add(userId);
+    }
+
+    public void removeLike(Integer userId) {
+        whoLiked.remove(userId);
     }
 }
