@@ -14,7 +14,7 @@ import java.util.Set;
 @RequestMapping("/films")
 public class FilmController {
 
-    FilmService filmService;
+    private FilmService filmService;
 
     @Autowired
     public FilmController(FilmService filmService) {
@@ -52,7 +52,8 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public Set<Film> getTopLikedFilms(@RequestParam(value = "count", defaultValue = "10", required = false) int count) {
+    public Set<Film> getPopularFilms(@RequestParam(value = "count", defaultValue = "10", required = false) int count) {
         return filmService.getTopLikedFilms(count);
     }
+
 }

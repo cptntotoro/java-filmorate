@@ -29,7 +29,7 @@ public class Film implements Serializable {
     @Positive(message = "Film duration is negative.")
     private int duration;
 
-    Set<Integer> whoLiked = new HashSet<>();
+    private Set<Integer> whoLiked = new HashSet<>();
 
     public Film() {
     }

@@ -27,9 +27,9 @@ public class User implements Serializable {
     @PastOrPresent
     private LocalDate birthday;
 
-    Set<Integer> friends = new HashSet<>();
+    private Set<Integer> friends = new HashSet<>();
 
-    Set<Integer> filmsLiked = new HashSet<>();
+    private Set<Integer> filmsLiked = new HashSet<>();
 
     public User() {
     }
