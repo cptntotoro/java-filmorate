@@ -3,23 +3,33 @@ package ru.yandex.practicum.filmorate.models;
 import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 public class User implements Serializable {
 
     private int id;
+
     @NotEmpty
     @Email
     @Pattern(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
     private String email;
+
     @NotNull
     @NotBlank
     @Pattern(regexp = "^[^\\s]*$")
     private String login;
+
     private String name;
+
     @NotNull
     @PastOrPresent
     private LocalDate birthday;
+
+    private Set<Integer> friends = new HashSet<>();
+
+    private Set<Integer> filmsLiked = new HashSet<>();
 
     public User() {
     }
@@ -91,5 +101,37 @@ public class User implements Serializable {
 
     public void setBirthday(LocalDate birthday) {
         this.birthday = birthday;
+    }
+
+    public Set<Integer> getFriends() {
+        return friends;
+    }
+
+    public void setFriends(Set<Integer> friends) {
+        this.friends = friends;
+    }
+
+    public void addFriend(int id) {
+        friends.add(id);
+    }
+
+    public void removeFriend(Integer id) {
+        friends.remove(id);
+    }
+
+    public Set<Integer> getFilmsLiked() {
+        return filmsLiked;
+    }
+
+    public void setFilmsLiked(Set<Integer> filmsLiked) {
+        this.filmsLiked = filmsLiked;
+    }
+
+    public void addFilmLiked(Integer filmId) {
+        filmsLiked.add(filmId);
+    }
+
+    public void removeFilmLiked(Integer filmId) {
+        filmsLiked.remove(filmId);
     }
 }

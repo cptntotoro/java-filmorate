@@ -4,7 +4,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.time.LocalDate;
 
-import static ru.yandex.practicum.filmorate.controllers.FilmController.BIRTHDAY_OF_CINEMA;
+import static ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage.BIRTHDAY_OF_CINEMA;
 
 public class ReleaseDateValidator implements ConstraintValidator<ReleaseDate, LocalDate> {
 
@@ -18,5 +18,4 @@ public class ReleaseDateValidator implements ConstraintValidator<ReleaseDate, Lo
         }
         return releaseDate.isAfter(BIRTHDAY_OF_CINEMA);
     }
-
 }

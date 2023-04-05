@@ -1,55 +1,63 @@
 package ru.yandex.practicum.filmorate.controllers;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.models.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashMap;
+import javax.validation.constraints.Positive;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    private final static Logger log = LoggerFactory.getLogger(UserController.class);
-    private int idCounter = 0;
-    private Map<Integer, User> users = new HashMap<>();
 
-    public int getIdCounter() {
-        return ++idCounter;
+    private UserService userService;
+
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @PostMapping
     public User add(@RequestBody @Valid User user) {
-        setNameAsLoginIfMissing(user);
-        user.setId(getIdCounter());
-        users.put(user.getId(), user);
-        return user;
+        return userService.add(user);
+    }
+
+    @GetMapping("/{id}")
+    public User getById(@PathVariable @Positive int id) {
+        return userService.getById(id);
     }
 
     @PutMapping
     public User update(@RequestBody @Valid User user) {
-        setNameAsLoginIfMissing(user);
-        if (users.containsKey(user.getId())) {
-            users.put(user.getId(), user);
-            return user;
-        }
-        log.warn("User was not found and could not be updated.");
-        throw new ValidationException("User with this id was not found and could not be updated.");
+        return userService.update(user);
     }
 
     @GetMapping
     public List<User> getAll() {
-        return new ArrayList<>(users.values());
+        return userService.getAll();
     }
 
-    private void setNameAsLoginIfMissing(User user) {
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
+    @PutMapping("/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable @Positive int id, @PathVariable @Positive int friendId) {
+        userService.addFriend(id, friendId);
+    }
+
+    @DeleteMapping("{id}/friends/{friendId}")
+    public void removeFriend(@PathVariable @Positive int id, @PathVariable @Positive int friendId) {
+        userService.removeFriend(id, friendId);
+    }
+
+    @GetMapping("/{id}/friends")
+    public Set<User> getFriends(@PathVariable @Positive int id) {
+        return userService.getFriends(id);
+    }
+
+    @GetMapping("/{id}/friends/common/{friendId}")
+    public Set<User> getCommonFriends(@PathVariable @Positive int id, @PathVariable @Positive int friendId) {
+        return userService.getCommonFriends(id, friendId);
     }
 }
