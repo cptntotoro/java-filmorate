@@ -1,2 +1,51 @@
-# java-filmorate
-Template repository for Filmorate project.
+# ER-диаграмма Filmorate
+![ER-диаграмма Filmorate.](https://github.com/cptntotoro/java-filmorate/blob/main/Database.png?raw=true)
+## Описание структуры базы данных
+
+### user - данные пользователей
+
+- id - id пользователя
+- email - электронная почта
+- login - логин
+- name - имя
+- birthday - дата рождения
+
+### film - данные о фильмах
+
+- id - id фильма
+- title - название фильма
+- description - описание
+- duration - продолжительность
+- release_date - дата выпуска
+- rating_id - id рейтинга
+
+### film_genre - таблица фильмов и их жанров
+
+- id - уникальный ключ для строк
+- film_id - id фильма
+- genre_id - id жанра
+
+### genre - данные о жанрах
+
+- id - id жанра
+- name - название жанра
+
+### film_rating - таблица фильмов и их рейтингов
+
+- film_id - id фильма
+- rating_id - id рейтинга
+
+### film_like - таблица фильмов и пользователей, поставивших лайки
+
+- id - уникальный ключ для строк
+- film_id - id фильма
+- user_id - id пользователя
+
+### friendship - таблица запросов и подтвержденных статусов дружбы между пользователями
+
+- id - уникальный ключ строк для поддержки связи "многие ко многим"
+- user_sender_id - id пользователя, отправившего запрос
+- user_recipient_id - id пользователя, получившего запрос
+- status - статус дружбы (подтверждена или нет)
+
+
