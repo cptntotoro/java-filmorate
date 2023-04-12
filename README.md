@@ -1,5 +1,5 @@
 # ER-диаграмма Filmorate
-![ER-диаграмма Filmorate.](https://github.com/cptntotoro/java-filmorate/blob/main/Database.png?raw=true)
+![ER-диаграмма Filmorate.](https://github.com/cptntotoro/java-filmorate/blob/main/database.png?raw=true)
 ## Описание структуры базы данных
 
 ### user - данные пользователей
