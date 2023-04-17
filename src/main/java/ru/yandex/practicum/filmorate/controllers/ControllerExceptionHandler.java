@@ -9,11 +9,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.yandex.practicum.filmorate.exceptions.ElementNotFoundException;
 
+import javax.validation.ConstraintViolationException;
 import java.util.Map;
 
 @RestControllerAdvice
 public class ControllerExceptionHandler {
-    private final static Logger log = LoggerFactory.getLogger(ControllerExceptionHandler.class);
+    private final Logger log = LoggerFactory.getLogger(ControllerExceptionHandler.class);
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
@@ -22,9 +23,9 @@ public class ControllerExceptionHandler {
         return Map.of("error", exception.getMessage());
     }
 
-    @ExceptionHandler(ElementNotFoundException.class)
+    @ExceptionHandler({ElementNotFoundException.class,ConstraintViolationException.class})
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    public Map<String, String> elementNotFoundExceptionHandler(ElementNotFoundException exception) {
+    public Map<String, String> elementNotFoundExceptionHandler(RuntimeException exception) {
         log.error(exception.getMessage());
         return Map.of("error", exception.getMessage());
     }

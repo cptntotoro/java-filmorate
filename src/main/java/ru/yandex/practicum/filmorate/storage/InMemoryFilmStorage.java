@@ -2,18 +2,18 @@ package ru.yandex.practicum.filmorate.storage;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.ElementNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.FunctionalityNotImplemetedException;
 import ru.yandex.practicum.filmorate.models.Film;
+import ru.yandex.practicum.filmorate.models.Genre;
+import ru.yandex.practicum.filmorate.models.Mpa;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Component
+@Component("inMemoryFilmStorage")
 public class InMemoryFilmStorage implements FilmStorage {
-
-    public final static LocalDate BIRTHDAY_OF_CINEMA = LocalDate.of(1895, 12, 28);
     private Map<Integer, Film> films = new HashMap<>();
     private int idCounter = 0;
 
@@ -38,7 +38,12 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getAllFilms() {
+    public void remove(Film film) {
+        throw new FunctionalityNotImplemetedException("This functionality has not been implemented.");
+    }
+
+    @Override
+    public List<Film> getAll() {
         return new ArrayList<>(films.values());
     }
 
@@ -49,4 +54,64 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
         throw new ElementNotFoundException("Film with id = " + id + " was not found.");
     }
+
+    @Override
+    public List<Genre> getFilmGenres(Integer filmId) {
+        throw new FunctionalityNotImplemetedException("This functionality has not been implemented.");
+    }
+
+    @Override
+    public Film updateFilmGenres(Film film) {
+        throw new FunctionalityNotImplemetedException("This functionality has not been implemented.");
+    }
+
+    @Override
+    public void addLike(Integer userId, Integer filmId) {
+        Film film = getById(filmId);
+//        User user = getById(userId);
+        if (!film.getWhoLiked().contains(userId)) { //&& !user.getFilmsLiked().contains(filmId)) {
+            film.addLike(userId);
+//            user.addFilmLiked(filmId);
+        } else {
+            throw new ElementNotFoundException("This user has already liked this film.");
+        }
+    }
+
+    @Override
+    public void removeLike(Integer userId, Integer filmId) {
+        Film film = getById(filmId);
+//        User user = getById(userId);
+        if (film.getWhoLiked().contains(userId)) { // && user.getFilmsLiked().contains(filmId)) {
+            film.removeLike(userId);
+//            user.removeFilmLiked(filmId);
+        } else {
+            throw new ElementNotFoundException("This user has not yet liked this film.");
+        }
+    }
+
+    @Override
+    public List<Film> getTopLikedFilms(Integer count) {
+        throw new FunctionalityNotImplemetedException("This functionality has not been implemented.");
+    }
+
+    @Override
+    public Mpa getMpa(Integer id) {
+        throw new FunctionalityNotImplemetedException("This functionality has not been implemented.");
+    }
+
+    @Override
+    public List<Mpa> getAllMpa() {
+        throw new FunctionalityNotImplemetedException("This functionality has not been implemented.");
+    }
+
+    @Override
+    public Genre getGenre(Integer id) {
+        throw new FunctionalityNotImplemetedException("This functionality has not been implemented.");
+    }
+
+    @Override
+    public List<Genre> getAllGenres() {
+        throw new FunctionalityNotImplemetedException("This functionality has not been implemented.");
+    }
+
 }
