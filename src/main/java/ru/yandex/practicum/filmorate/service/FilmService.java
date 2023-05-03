@@ -1,31 +1,30 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
-import ru.yandex.practicum.filmorate.exceptions.ElementNotFoundException;
 import ru.yandex.practicum.filmorate.models.Film;
-import ru.yandex.practicum.filmorate.models.User;
+import ru.yandex.practicum.filmorate.models.Genre;
+import ru.yandex.practicum.filmorate.models.Mpa;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import javax.validation.Valid;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
 
+    @Autowired
+    @Qualifier("filmDbStorage")
     private FilmStorage filmStorage;
 
-    private UserStorage userStorage;
-
     @Autowired
-    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
-        this.filmStorage = filmStorage;
-        this.userStorage = userStorage;
-    }
+    @Qualifier("userDbStorage")
+    private UserStorage userStorage;
 
     public Film add(Film film) {
         return filmStorage.add(film);
@@ -40,35 +39,34 @@ public class FilmService {
     }
 
     public List<Film> getAll() {
-        return filmStorage.getAllFilms();
+        return filmStorage.getAll();
     }
 
     public void addLike(int filmId, int userId) {
-        Film film = filmStorage.getById(filmId);
-        User user = userStorage.getById(userId);
-        if (!film.getWhoLiked().contains(userId) && !user.getFilmsLiked().contains(filmId)) {
-            film.addLike(userId);
-            user.addFilmLiked(filmId);
-        } else {
-            throw new ElementNotFoundException("This user has already liked this film.");
-        }
+        filmStorage.addLike(userId, filmId);
     }
 
     public void removeLike(int filmId, int userId) {
-        Film film = filmStorage.getById(filmId);
-        User user = userStorage.getById(userId);
-        if (film.getWhoLiked().contains(userId) && user.getFilmsLiked().contains(filmId)) {
-            film.removeLike(userId);
-            user.removeFilmLiked(filmId);
-        } else {
-            throw new ElementNotFoundException("This user has not yet liked this film.");
-        }
+        filmStorage.removeLike(userId, filmId);
     }
 
-    public Set<Film> getTopLikedFilms(int count) {
-        return filmStorage.getAllFilms().stream()
-                .sorted((o1, o2) -> o1.getWhoLiked().size() >= o2.getWhoLiked().size() ? -1 : 1)
-                .limit(count)
-                .collect(Collectors.toSet());
+    public Set<Film> getTopLikedFilms(Integer count) {
+        return new HashSet<>(filmStorage.getTopLikedFilms(count));
+    }
+
+    public Mpa getMpa(Integer mpaId) {
+        return filmStorage.getMpa(mpaId);
+    }
+
+    public List<Mpa> getAllMpa() {
+        return filmStorage.getAllMpa();
+    }
+
+    public Genre getGenre(Integer id) {
+        return filmStorage.getGenre(id);
+    }
+
+    public List<Genre> getAllGenres() {
+        return filmStorage.getAllGenres();
     }
 }
