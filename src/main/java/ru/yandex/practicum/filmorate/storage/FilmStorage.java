@@ -20,8 +20,6 @@ public interface FilmStorage {
 
     List<Genre> getFilmGenres(Integer filmId);
 
-    Film updateFilmGenres(Film film);
-
     void addLike(Integer userId, Integer filmId);
 
     void removeLike(Integer userId, Integer filmId);
@@ -36,4 +34,7 @@ public interface FilmStorage {
 
     List<Genre> getAllGenres();
 
+    List<Film> getByDirectorSortedByYear(Integer directorId);
+
+    List<Film> getByDirectorSortedByLikes(Integer directorId);
 }

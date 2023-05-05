@@ -27,8 +27,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User add(User user) {
-        String sqlQuery = "INSERT INTO users(email, login, name, birthday) " +
-                "VALUES (?, ?, ?, ?)";
+        String sqlQuery = "INSERT INTO users (email, login, name, birthday) VALUES (?, ?, ?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
@@ -94,66 +93,44 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<User> getFriends(Integer userId) {
-        String sqlQuery = "SELECT us.id as id, us.email, us.login, us.name, us.birthday FROM " +
-                "(SELECT (user_sender_id + user_recipient_id - " + userId + ") as id, " +
-                "FROM friendships WHERE " +
-                "(user_recipient_id = " + userId + " AND status=true) OR " +
-                "user_sender_id = " + userId +
-                ") as fr, users as us WHERE us.id = fr.id";
-        return jdbcTemplate.query(sqlQuery, USER_ROW_MAPPER);
+//
+        String sqlQuery = "SELECT u.id, u.email, u.login, u.name, u.birthday " +
+                "FROM friendships AS fs " +
+                "JOIN users as u ON fs.user_recipient_id = u.id " +
+                "WHERE fs.user_sender_id = ?";
+
+        return jdbcTemplate.query(sqlQuery, USER_ROW_MAPPER, userId);
     }
 
     public void sendFriendRequest(Integer userSenderId, Integer userRecipientId) {
-        if (Objects.equals(userSenderId, userRecipientId) || userRecipientId < 1) {
-            throw new ElementNotFoundException("Unable to process request for identical or negative user ids.");
+        if (Objects.equals(userSenderId, userRecipientId) || userSenderId < 1 || userRecipientId < 1) {
+            throw new ElementNotFoundException("Failed to process request for identical, negative or equal to zero user ids.");
         }
-        String sqlQuery = "INSERT INTO friendships (user_sender_id, user_recipient_id, status) " +
-                "VALUES (?, ?, 'FALSE')";
 
-        int rowsUpdated = jdbcTemplate.update(connection -> {
-            PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"id"});
-            stmt.setInt(1, userSenderId);
-            stmt.setInt(2, userRecipientId);
-            return stmt;
-        });
-
-        if (rowsUpdated == 0) {
-            throw new ElementNotFoundException("Unable to remove user.");
-        }
+        jdbcTemplate.update("INSERT INTO friendships (user_sender_id, user_recipient_id) " +
+                "VALUES (?, ?)", userSenderId, userRecipientId);
     }
 
     @Override
     public void removeFriend(Integer userId, Integer userFriendId) {
-        String sqlQuery = "DELETE FROM friendships WHERE (user_sender_id = " + userId + " and user_recipient_id = " + userFriendId + ") " +
-                "OR (user_recipient_id = " + userId + " and user_sender_id = " + userFriendId + ")";
-
-        jdbcTemplate.update(connection -> {
-            return connection.prepareStatement(sqlQuery);
-        });
+        jdbcTemplate.update("DELETE FROM friendships WHERE (user_sender_id = ? AND user_recipient_id = ?) " +
+                "OR (user_recipient_id = ? AND user_sender_id = ?)", userId, userFriendId, userId, userFriendId);
     }
 
     @Override
     public List<User> getCommonFriends(Integer userId, Integer anotherUserId) {
-        String sqlQuery = "SELECT us.id as id, us.email, us.login, us.name, us.birthday FROM " +
-                "(SELECT fr1.id as id FROM " +
-                "(SELECT (user_sender_id + user_recipient_id - " + userId + ") as id " +
-                "FROM friendships WHERE " +
-                "(user_recipient_id = " + userId + " AND status=true) OR " +
-                "user_sender_id = " + userId +
-                ") as fr1 " +
+        String sqlQuery = "SELECT u.id, u.email, u.login, u.name, u.birthday " +
+                "FROM users AS u " +
+                "WHERE u.id IN " +
+                "(SELECT f1.user_recipient_id " +
+                "FROM friendships f1 " +
+                "WHERE user_sender_id = ? " +
+                "INTERSECT " +
+                "SELECT f2.user_recipient_id " +
+                "FROM friendships f2 " +
+                "WHERE user_sender_id = ?)";
 
-                "INNER JOIN " +
-
-                "(SELECT (user_sender_id + user_recipient_id - " + anotherUserId + ") as id " +
-                "FROM friendships WHERE " +
-                "(user_recipient_id = " + anotherUserId + " AND status=true) OR " +
-                "user_sender_id = " + anotherUserId +
-                ") as fr2 " +
-
-                "ON fr1.id = fr2.id ) as fr," +
-                "users as us WHERE us.id = fr.id";
-
-        return jdbcTemplate.query(sqlQuery, USER_ROW_MAPPER);
+        return jdbcTemplate.query(sqlQuery, USER_ROW_MAPPER, anotherUserId, userId);
     }
 
     private static final RowMapper<User> USER_ROW_MAPPER = (rs, rowNum) -> {
@@ -165,5 +142,4 @@ public class UserDbStorage implements UserStorage {
         user.setBirthday(rs.getDate("birthday").toLocalDate());
         return user;
     };
-
 }
