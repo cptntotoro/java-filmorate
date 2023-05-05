@@ -13,7 +13,7 @@
 6. REST API, эндпоинты которого соответствуют ключевым методам программы
 
 ## Структура базы данных
-![ER-диаграмма Filmorate.](https://github.com/cptntotoro/java-filmorate/blob/main/database.png?raw=true)
+![ER-диаграмма Filmorate](https://github.com/cptntotoro/java-filmorate/blob/main/database.png?raw=true)
 
 ### users - данные пользователей
 
