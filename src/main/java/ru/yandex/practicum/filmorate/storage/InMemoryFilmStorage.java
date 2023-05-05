@@ -61,11 +61,6 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film updateFilmGenres(Film film) {
-        throw new FunctionalityNotImplemetedException("This functionality has not been implemented.");
-    }
-
-    @Override
     public void addLike(Integer userId, Integer filmId) {
         Film film = getById(filmId);
 //        User user = getById(userId);
@@ -112,6 +107,16 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public List<Genre> getAllGenres() {
         throw new FunctionalityNotImplemetedException("This functionality has not been implemented.");
+    }
+
+    @Override
+    public List<Film> getByDirectorSortedByYear(Integer directorId) {
+        return null;
+    }
+
+    @Override
+    public List<Film> getByDirectorSortedByLikes(Integer directorId) {
+        return null;
     }
 
 }

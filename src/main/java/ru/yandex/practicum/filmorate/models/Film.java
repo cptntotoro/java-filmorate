@@ -36,6 +36,8 @@ public class Film implements Serializable {
 
     private Set<Integer> whoLiked = new HashSet<>();
 
+    private Set<Director> directors = new HashSet<>();
+
     public Film() {
     }
 
@@ -79,8 +81,6 @@ public class Film implements Serializable {
         this(name, description, releaseDate, duration);
         this.id = id;
     }
-
-
 
     @Override
     public boolean equals(Object o) {
@@ -167,5 +167,13 @@ public class Film implements Serializable {
 
     public void setMpa(Mpa mpa) {
         this.mpa = mpa;
+    }
+
+    public Set<Director> getDirectors() {
+        return directors;
+    }
+
+    public void setDirectors(Set<Director> directors) {
+        this.directors = directors;
     }
 }
