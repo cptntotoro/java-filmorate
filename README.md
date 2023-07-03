@@ -1,62 +1,19 @@
-# java-kanban
-### Java, Spring Boot, Spring MVC, REST API, JUnit, H2
+# Filmorate - a film-rating and user community application
+Tech stack: Java, Spring Boot, Spring MVC, SQL, H2, REST API, JUnit
 
-Сервис для оценивания фильмов и сообщество пользователей. 
+## About
 
-Приложение реализует следующую функциональность: 
+The application stores the data in memory or in a database. CRUD and advanced database requests are written manually. Retrived data is mapped with RowMapper.
 
-1. Создание, получение, удаление, обновление и управление фильмами, их рейтингами, жанрами, режиссёрами, пользовательскими лайками
-2. Создание, получение, удаление, обновление и управление пользователями
-3. Получение фильмов согласно фильтрам и их комбинациям 
-4. Реализация односторонней дружбы между пользователями, получение общих друзей
-5. Загрузка и сохранение данных в базу данных (H2)
-6. REST API, эндпоинты которого соответствуют ключевым методам программы
+### Key features: 
+- Film management
+- Director management
+- Film rating (MPA) management
+- User friendship 
 
-## Структура базы данных
+## Database structure
 ![ER-диаграмма Filmorate](https://github.com/cptntotoro/java-filmorate/blob/main/ERdiagram.png?raw=true)
 
-### users - данные пользователей
+## How to use
 
-- id - id пользователя
-- email - электронная почта
-- login - логин
-- name - имя
-- birthday - дата рождения
-
-### films - данные о фильмах
-
-- id - id фильма
-- title - название фильма
-- description - описание
-- duration - продолжительность
-- release_date - дата выпуска
-- mpa_id - id рейтинга
-
-### film_genres - таблица фильмов и их жанров
-
-- id - уникальный ключ для строк
-- film_id - id фильма
-- genre_id - id жанра
-
-### genres - данные о жанрах
-
-- id - id жанра
-- name - название жанра
-
-### mpas - данные о рейтингах
-
-- id - id рейтинга
-- name - название рейтинга
-
-### film_likes - таблица фильмов и пользователей, поставивших лайки
-
-- id - уникальный ключ для строк
-- film_id - id фильма
-- user_id - id пользователя
-
-### friendships - таблица запросов и подтвержденных статусов дружбы между пользователями
-
-- id - уникальный ключ строк для поддержки связи "многие ко многим"
-- user_sender_id - id пользователя, отправившего запрос
-- user_recipient_id - id пользователя, получившего запрос
-- status - статус дружбы (подтверждена или нет)
+To see request and response examples, please refer to [this Postman test collection](https://github.com/yandex-praktikum/java-filmorate/blob/add-database/postman/sprint.json)
