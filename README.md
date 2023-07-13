@@ -1,19 +1,18 @@
-# Filmorate - a film-rating and user community application
-Tech stack: Java, Spring Boot, Spring MVC, SQL, H2, REST API, JUnit
+# Filmorate - сообщество для оценки и рекомендации фильмов 
+Java, Spring Boot, Spring MVC, SQL, H2, REST API, JUnit
 
-## About
+## О проекте
+Монолитное приложение, способное хранить данные в памяти или в базе данных. CRUD и другие запросы к базе данных написаны вручную. Получченные данные обрабатываются с помощью RowMapper.
 
-The application stores the data in memory or in a database. CRUD and advanced database requests are written manually. Retrived data is mapped with RowMapper.
+### Основная функциональность:
+- Регистрация и получение пользователей
+- Добавление пользователей в писок друзей
+- Добавление, обновление и удаление фильмов
+- Поиск фильмов по названию и режиссёру
+- Добавление пользовательских отзывов на фильмы
 
-### Key features: 
-- Film management
-- Director management
-- Film rating (MPA) management
-- User friendship 
-
-## Database structure
+## ER-диаграмма
 ![ER-диаграмма Filmorate](https://github.com/cptntotoro/java-filmorate/blob/main/ERdiagram.png?raw=true)
 
-## How to use
-
-To see request and response examples, please refer to [this Postman test collection](https://github.com/yandex-praktikum/java-filmorate/blob/add-database/postman/sprint.json)
+## Как использовать:
+Ознакомиться с примерами использования можно в [этой коллекции тестов Postman](https://github.com/yandex-praktikum/java-filmorate/blob/add-database/postman/sprint.json)
